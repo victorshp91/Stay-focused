@@ -8,14 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
+    @StateObject private var viewModel = AppViewModel()
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    @State private var showOnboarding = false
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        ZStack {
+            if !hasSeenOnboarding {
+                OnboardingView(isPresented: $showOnboarding)
+                    .onAppear {
+                        showOnboarding = true
+                    }
+                    .onChange(of: showOnboarding) { newValue in
+                        if !newValue {
+                            hasSeenOnboarding = true
+                        }
+                    }
+            } else {
+                MainTabView()
+                    .environmentObject(viewModel)
+            }
         }
-        .padding()
     }
 }
 
